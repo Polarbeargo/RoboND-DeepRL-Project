@@ -35,14 +35,14 @@
 /
 */
 
-#define INPUT_WIDTH   512
-#define INPUT_HEIGHT  512
-#define OPTIMIZER "None"
-#define LEARNING_RATE 0.0f
+#define INPUT_WIDTH   64 // Input image size will influence  memory usage
+#define INPUT_HEIGHT  64
+#define OPTIMIZER "Adam" // Can change optimizer Adam, RMSprop, AdaGrad, None
+#define LEARNING_RATE 0.01f // Small number will slow learning speed but minimize error
 #define REPLAY_MEMORY 10000
-#define BATCH_SIZE 8
-#define USE_LSTM false
-#define LSTM_SIZE 32
+#define BATCH_SIZE 8  // Smaller size will reduce more computing power.
+#define USE_LSTM true
+#define LSTM_SIZE 8
 
 /*
 / TODO - Define Reward Parameters
