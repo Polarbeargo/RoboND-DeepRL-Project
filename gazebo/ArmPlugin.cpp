@@ -73,6 +73,9 @@
 // Lock base rotation DOF (Add dof in header file if off)
 #define LOCKBASE true
 
+// Define gazebo topic
+#define CAMERA_TOPIC "/gazebo/" WORLD_NAME "/camera/link/camera/image"
+#define COLLISION_TOPIC "/gazebo/" WORLD_NAME "/" PROP_NAME "/link/my_contact"
 
 namespace gazebo
 {
@@ -140,7 +143,7 @@ void ArmPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 	/
 	*/
 	
-	//cameraSub = None;
+	cameraSub = cameraNode->Subscribe(CAMERA_TOPIC, &ArmPlugin::onCameraMsg, this);
 
 	// Create our node for collision detection
 	collisionNode->Init();
@@ -150,7 +153,7 @@ void ArmPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 	/
 	*/
 	
-	//collisionSub = None;
+	collisionSub = collisionNode->Subscribe(COLLISION_TOPIC, &ArmPlugin::onCollisionMsg, this);
 
 	// Listen to the update event. This event is broadcast every simulation iteration.
 	this->updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&ArmPlugin::OnUpdate, this, _1));
