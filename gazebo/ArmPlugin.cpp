@@ -252,7 +252,7 @@ void ArmPlugin::onCameraMsg(ConstImageStampedPtr &_msg)
 // onCollisionMsg
 void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 {
-	//if(DEBUG){printf("collision callback (%u contacts)\n", contacts->contact_size());}
+	if(DEBUG){printf("collision callback (%u contacts)\n", contacts->contact_size());}
 
 	if( testAnimation )
 		return;
@@ -270,20 +270,20 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 		/ TODO - Check if there is collision between the arm and object, then issue learning reward
 		/
 		*/
-		
-		/*
+		const bool collisionCheck = ( strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM) == 0 );
 		
 		if (collisionCheck)
 		{
-			rewardHistory = None;
-
-			newReward  = None;
-			endEpisode = None;
-
-			return;
+			rewardHistory = REWARD_WIN;
+			newReward  = true;
+			endEpisode = true;
+			
+		} else{
+			rewardHistory = REWARD_LOSS;
+			newReward  = true;
+			endEpisode = false;
 		}
-		*/
-		
+		return;
 	}
 }
 
