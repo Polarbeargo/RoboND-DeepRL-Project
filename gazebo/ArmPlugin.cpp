@@ -51,7 +51,6 @@
 
 #define REWARD_WIN  20.0f
 #define REWARD_LOSS -20.0f
-#define rewardHistory 2
 #define REWARD_MUL 0.3f
 #define  ALPHA 0.4f
 
