@@ -35,12 +35,12 @@
 /
 */
 
-#define INPUT_WIDTH   128 // Input image size will influence  memory usage
-#define INPUT_HEIGHT  128
+#define INPUT_WIDTH   64 // Input image size will influence  memory usage
+#define INPUT_HEIGHT  64
 #define OPTIMIZER "Adam" // Can change optimizer Adam, RMSprop, AdaGrad, None
 #define LEARNING_RATE 0.01f // Small number will slow learning speed but minimize error
 #define REPLAY_MEMORY 10000
-#define BATCH_SIZE 256  // Smaller size will reduce more computing power.
+#define BATCH_SIZE 128  // Smaller size will reduce more computing power.
 #define USE_LSTM true
 #define LSTM_SIZE 256
 
@@ -51,8 +51,9 @@
 
 #define REWARD_WIN 20.0f
 #define REWARD_LOSS -20.0f
-#define REWARD_MUL 0.3f
+#define REWARD_MUL 5.0f
 #define ALPHA 0.4f
+#define PENALTY 0.4f
 #define NUM_ACTIONS DOF*2
 
 // Define Object Names
@@ -282,7 +283,14 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
               printf("+ GRIPPER CONTACT ");
             }
 			const bool collisionGripper = ( strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT) == 0 );
-			rewardHistory = collisionGripper ? REWARD_WIN : REWARD_LOSS;
+			rewardHistory = collisionGripper ? REWARD_LOSS*REWARD_LOSS*REWARD_LOSS:REWARD_WIN;
+            if (collisionGripper)
+			{
+				rewardHistory = REWARD_WIN * REWARD_WIN;
+				if(DEBUG){printf("+ GRIPPER CONTACT ");}
+			} else {
+				if(DEBUG){printf("ARM CONTACT ");}
+			}
 			newReward  = true;
 			endEpisode = true;			
 		} 
@@ -320,10 +328,10 @@ bool ArmPlugin::updateAgent()
 		return false;
 	}
 
-	if(DEBUG){printf("ArmPlugin - agent selected action %i\n", action);}
+	//if(DEBUG){printf("ArmPlugin - agent selected action %i\n", action);}
 	
 	const int jointIndex = action / 2;
-	const int actionDirection = 2 * (action % 2) - 1;
+	const int actionDirection = 1 - 2 * (action % 2);
 
 #if VELOCITY_CONTROL
 	// if the action is even, increase the joint position by the delta parameter
@@ -335,7 +343,7 @@ bool ArmPlugin::updateAgent()
 	/
 	*/
 	
-	float velocity = vel[jointIndex] + actionVelDelta * actionDirection; // TODO - Set joint velocity based on whether action is even or odd.
+	const float velocity = vel[jointIndex] + actionVelDelta * actionDirection; // TODO - Set joint velocity based on whether action is even or odd.
 
 	if( velocity < VELOCITY_MIN )
 		velocity = VELOCITY_MIN;
@@ -455,9 +463,7 @@ bool ArmPlugin::updateJoints()
 		// update the AI agent when new camera frame is ready
 		episodeFrames++;
 
-		if(DEBUG){printf("episode frame = %i\n", episodeFrames);}
-
-		// reset camera ready flag
+		//if(DEBUG){printf("episode frame                         = %i\n", epis camera ready flag
 		newState = false;
 
 		if( updateAgent() )
@@ -592,19 +598,19 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
 		const bool checkGroundContact =  ( gripBBox.min.z <= groundContact || gripBBox.max.z <= groundContact );
 		
 		if(checkGroundContact)
-		{
-						
+		{						
 			if(DEBUG){printf("GROUND CONTACT, EOE\n");}
-
-			rewardHistory = REWARD_LOSS;
+			rewardHistory = REWARD_LOSS*REWARD_LOSS*REWARD_LOSS;
 			newReward     = true;
 			endEpisode    = true;
-		} else {
+		} 
 			
 		/*
 		/ TODO - Issue an interim reward based on the distance to the object
 		/
 		*/ 
+        if(!checkGroundContact)
+		{
 			const float distGoal = BoxDistance(gripBBox, propBBox); // compute the reward from distance to the goal
 
 			if(DEBUG){printf("distance('%s', '%s') = %f\n", gripper->GetName().c_str(), prop->model->GetName().c_str(), distGoal);}
@@ -616,17 +622,19 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
 
 				// compute the smoothed moving average of the delta of the distance to the goal
 				avgGoalDelta  = (avgGoalDelta * ALPHA) + (distDelta * (1.0 - ALPHA));
-				rewardHistory = (avgGoalDelta) * REWARD_MUL;
-				newReward     = true;	
+                if(DEBUG){printf("distDelta: %7.5f avgGoalDelta: %7.5f ", distDelta, avgGoalDelta);}
+				rewardHistory = (avgGoalDelta) * REWARD_MUL - PENALTY;
+				newReward     = true;
+                if(DEBUG){printf("INTERIM_REWARD: %8.5f\n", rewardHistory);}
 			}
 			lastGoalDistance = distGoal;
-		 } 
+        } 
 	}
 
 	// issue rewards and train DQN
 	if( newReward && agent != NULL )
 	{
-		if(DEBUG){printf("ArmPlugin - issuing reward %f, EOE=%s  %s\n", rewardHistory, endEpisode ? "true" : "false", (rewardHistory > 0.1f) ? "POS+" :(rewardHistory > 0.0f) ? "POS" : (rewardHistory < 0.0f) ? "    NEG" : "       ZERO");}
+		//if(DEBUG){printf("ArmPlugin - issuing reward %f, EOE=%s  %s\n", rewardHistory, endEpisode ? "true" : "false", (rewardHistory > 0.1f) ? "POS+" :(rewardHistory > 0.0f) ? "POS" : (rewardHistory < 0.0f) ? "    NEG" : "       ZERO");}
 		agent->NextReward(rewardHistory, endEpisode);
 
 		// reset reward indicator
@@ -657,4 +665,3 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
 }
 
 }
-
