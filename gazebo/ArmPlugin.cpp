@@ -27,8 +27,8 @@
 #define DEBUG_DQN false
 #define GAMMA 0.9f
 #define EPS_START 0.9f
-#define EPS_END 0.05f
-#define EPS_DECAY 200
+#define EPS_END 0.0f
+#define EPS_DECAY 250
 
 /*
 / TODO - Tune the following hyperparameters
@@ -37,8 +37,8 @@
 
 #define INPUT_WIDTH   64 // Input image size will influence  memory usage
 #define INPUT_HEIGHT  64
-#define OPTIMIZER "Adam" // Can change optimizer Adam, RMSprop, AdaGrad, None
-#define LEARNING_RATE 0.01f // Small number will slow learning speed but minimize error
+#define OPTIMIZER "RMSprop" // Can change optimizer Adam, RMSprop, AdaGrad, None
+#define LEARNING_RATE 0.9f // Small number will slow learning speed but minimize error
 #define REPLAY_MEMORY 10000
 #define BATCH_SIZE 128  // Smaller size will reduce more computing power.
 #define USE_LSTM true
