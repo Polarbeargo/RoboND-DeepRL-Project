@@ -35,14 +35,14 @@
 /
 */
 
-#define INPUT_WIDTH   64 // Input image size will influence  memory usage
-#define INPUT_HEIGHT  64
+#define INPUT_WIDTH   128 // Input image size will influence  memory usage
+#define INPUT_HEIGHT  128
 #define OPTIMIZER "Adam" // Can change optimizer Adam, RMSprop, AdaGrad, None
 #define LEARNING_RATE 0.01f // Small number will slow learning speed but minimize error
 #define REPLAY_MEMORY 10000
-#define BATCH_SIZE 8  // Smaller size will reduce more computing power.
+#define BATCH_SIZE 256  // Smaller size will reduce more computing power.
 #define USE_LSTM true
-#define LSTM_SIZE 8
+#define LSTM_SIZE 256
 
 /*
 / TODO - Define Reward Parameters
@@ -260,11 +260,14 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 
 	for (unsigned int i = 0; i < contacts->contact_size(); ++i)
 	{
-		if( strcmp(contacts->contact(i).collision2().c_str(), COLLISION_FILTER) == 0 )
+		bool collisionWithGround = ( strcmp(contacts->contact(i).collision2().c_str(), COLLISION_FILTER) == 0 );
+		if(collisionWithGround)
 			continue;
 
-		if(DEBUG){std::cout << "Collision between[" << contacts->contact(i).collision1()
-			     << "] and [" << contacts->contact(i).collision2() << "]\n";}
+		if(DEBUG){
+          std::cout << "Collision between[" << contacts->contact(i).collision1()
+			     << "] and [" << contacts->contact(i).collision2() << "]\n";
+        }
 
 	
 		/*
@@ -272,19 +275,17 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 		/
 		*/
 		const bool collisionCheck = ( strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM) == 0 );
-		const bool collisionGripper = ( strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT) == 0 );
 		
-		if (collisionCheck && collisionGripper)
+		if (collisionCheck)
 		{
-			rewardHistory = REWARD_WIN;
+          	if(DEBUG){
+              printf("+ GRIPPER CONTACT ");
+            }
+			const bool collisionGripper = ( strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT) == 0 );
+			rewardHistory = collisionGripper ? REWARD_WIN : REWARD_LOSS;
 			newReward  = true;
-			endEpisode = true;
-			
-		} else{
-			rewardHistory = REWARD_LOSS;
-			newReward  = true;
-			endEpisode = false;
-		}
+			endEpisode = true;			
+		} 
 		return;
 	}
 }
