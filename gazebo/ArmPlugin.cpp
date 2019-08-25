@@ -71,6 +71,7 @@
 
 // Set Debug Mode
 #define DEBUG false
+#define GRIP_ON 1
 
 // Lock base rotation DOF (Add dof in header file if off)
 #define LOCKBASE true
@@ -283,7 +284,7 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
               printf("+ GRIPPER CONTACT ");
             }
 			const bool collisionGripper = ( strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT) == 0 );
-			rewardHistory = collisionGripper ? REWARD_LOSS*REWARD_LOSS*REWARD_LOSS:REWARD_WIN;
+			rewardHistory = GRIP_ON ? REWARD_LOSS*REWARD_LOSS*REWARD_LOSS:REWARD_WIN;
             if (collisionGripper)
 			{
 				rewardHistory = REWARD_WIN * REWARD_WIN;
@@ -292,9 +293,10 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 				if(DEBUG){printf("ARM CONTACT ");}
 			}
 			newReward  = true;
-			endEpisode = true;			
+			endEpisode = true;
+            return;
 		} 
-		return;
+		
 	}
 }
 
@@ -621,7 +623,7 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
 				const float distDelta  = lastGoalDistance - distGoal;
 
 				// compute the smoothed moving average of the delta of the distance to the goal
-				avgGoalDelta  = (avgGoalDelta * ALPHA) + (distDelta * (1.0 - ALPHA));
+				avgGoalDelta  = (avgGoalDelta * ALPHA) + (distDelta * (1.0f - ALPHA));
                 if(DEBUG){printf("distDelta: %7.5f avgGoalDelta: %7.5f ", distDelta, avgGoalDelta);}
 				rewardHistory = (avgGoalDelta) * REWARD_MUL - PENALTY;
 				newReward     = true;
