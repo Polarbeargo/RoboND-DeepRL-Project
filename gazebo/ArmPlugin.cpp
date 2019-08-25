@@ -49,10 +49,10 @@
 /
 */
 
-#define REWARD_WIN 20.0f
-#define REWARD_LOSS -20.0f
+#define REWARD_WIN 30.0f
+#define REWARD_LOSS -30.0f
 #define REWARD_MUL 5.0f
-#define ALPHA 0.4f
+#define ALPHA 0.6f
 #define PENALTY 0.4f
 #define NUM_ACTIONS DOF*2
 
@@ -146,7 +146,7 @@ void ArmPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 	/
 	*/
 	
-	cameraSub = cameraNode->Subscribe(CAMERA_TOPIC, &ArmPlugin::onCameraMsg, this);
+	cameraSub = cameraNode->Subscribe("/gazebo/arm_world/camera/link/camera/image", &ArmPlugin::onCameraMsg, this);
 
 	// Create our node for collision detection
 	collisionNode->Init();
@@ -156,7 +156,7 @@ void ArmPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 	/
 	*/
 	
-	collisionSub = collisionNode->Subscribe(COLLISION_TOPIC, &ArmPlugin::onCollisionMsg, this);
+	collisionSub = collisionNode->Subscribe("/gazebo/arm_world/tube/tube_link/my_contact", &ArmPlugin::onCollisionMsg, this);
 
 	// Listen to the update event. This event is broadcast every simulation iteration.
 	this->updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&ArmPlugin::OnUpdate, this, _1));
@@ -279,12 +279,9 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 		const bool collisionCheck = ( strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM) == 0 );
 		
 		if (collisionCheck)
-		{
-          	if(DEBUG){
-              printf("+ GRIPPER CONTACT ");
-            }
-			const bool collisionGripper = ( strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT) == 0 );
+		{	
 			rewardHistory = GRIP_ON ? REWARD_LOSS*REWARD_LOSS*REWARD_LOSS:REWARD_WIN;
+            const bool collisionGripper = ( strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT) == 0 );
             if (collisionGripper)
 			{
 				rewardHistory = REWARD_WIN * REWARD_WIN;
