@@ -49,7 +49,7 @@ The goal of this project is to create a DQN agent and define reward functions to
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Deep Reinforcement Learning Arm Manipulation, DQN, Robotics Software Engineer Nanodegree Program, Robot, IEEEtran, Udacity, \LaTeX.
+Deep Reinforcement Learning Arm Manipulation, DQN, LSTM, Robotics Software Engineer Nanodegree Program, Robot, IEEEtran, Udacity, \LaTeX.
 \end{IEEEkeywords}}
 
 \maketitle
@@ -58,8 +58,23 @@ Deep Reinforcement Learning Arm Manipulation, DQN, Robotics Software Engineer Na
 \section{Introduction}
 \label{sec:introduction}
 
-\IEEEPARstart{D}{ee}p Reinforcement Learning
+\IEEEPARstart{D}{ee}p Q-Network(DQN) introduced to training a Q value function represented by multi-layer perceptron. This project will use Gazebo simulation environment integrate with C/C++ API developed by NVIDIA to interface Gazebo robotic arm to DQN agent run simulation and training the LSTM based Deep Q-Network(DQN) on Udacity GPU enabled server with the following task will be implemented:  
 
+- Subscribe to camera and collision topics.  
+
+- Create the DQN Agent.
+
+- Velocity or position based control of arm joints.
+
+- Reward for robot gripper hitting the ground.
+
+- Interim reward based on the distance to the object.
+
+- Reward based on collision between the arm and the object.
+
+- Tuning the hyperparameters.
+
+- Reward based on collision between the arm’s gripper base and the object.
 \section{Background}
   %example for inserting image
 \begin{figure}[thpb]
@@ -130,6 +145,7 @@ const bool checkGroundContact =  ( gripBBox.min.z <= groundContact || gripBBox.m
 const float distDelta  = lastGoalDistance - distGoal;
 // Compute the smoothed moving average of the delta of the distance to the goal
 avgGoalDelta  = (avgGoalDelta * ALPHA) + (distDelta * (1.0f - ALPHA));
+rewardHistory = (avgGoalDelta) * REWARD_MUL - PENALTY;
 \end{lstlisting}
 
 %example for Bullet point list
@@ -217,4 +233,12 @@ Both task have trained with the parameters in TABLE 1 and the two primary object
 As Observed if don't add time penalty the robotic arm will start trembly around it's target and if the LSTM size lower than 256 will take longer time to reach the target accuracy.
 
 \section{Conclusion / Future work}
+Training a Deep Reinforcement Learning agent takes a lot of time. Tuning LSTM size, image size, learning rate and batch size will influence the time reach it's target accuracy. The advantages of the C/C++ API develope by NVIDIA provide for robotics RL problems include leverage the power of GPU acceleration speed up RL agent training increase execution performance by using C/C++ compilation instead of interpreted python scripts optimized on specific embedded platform NVIDIA Jetson TX2. In the future exploration I would like to see the application of a genetic algorithm (GA) to find the values of parameters used in Deep Deterministic Policy Gradient (DDPG) with Hindsight Experience Replay (HER), to help speed up the learning agent[1] on NVIDIA Jetson TX2.
+
+\bibliography{bib}
+\bibliographystyle{ieeetr}
+
+[1] Deep Reinforcement Learning using Genetic
+Algorithm for Parameter Optimization
+Adarsh Sehgal, Hung Manh La, Sushil J. Louis, Hai Nguyen. To Appear in arxiv 2019.
 \end{document}
