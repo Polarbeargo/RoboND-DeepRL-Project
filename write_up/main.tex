@@ -58,8 +58,24 @@ Deep Reinforcement Learning Arm Manipulation, DQN, Robotics Software Engineer Na
 \section{Introduction}
 \label{sec:introduction}
 
-\IEEEPARstart{D}{ee}p Reinforcement Learning
+\IEEEPARstart{D}{ee}p Q-Network(DQN) introduced to training a Q value function represented by multi-layer perceptron.
+The following task will be implemented:  
 
+- Subscribe to camera and collision topics.  
+
+- Create the DQN Agent.
+
+- Velocity or position based control of arm joints.
+
+- Reward for robot gripper hitting the ground.
+
+- Interim reward based on the distance to the object.
+
+- Reward based on collision between the arm and the object.
+
+- Tuning the hyperparameters.
+
+- Reward based on collision between the arm’s gripper base and the object.
 \section{Background}
   %example for inserting image
 \begin{figure}[thpb]
@@ -217,4 +233,5 @@ Both task have trained with the parameters in TABLE 1 and the two primary object
 As Observed if don't add time penalty the robotic arm will start trembly around it's target and if the LSTM size lower than 256 will take longer time to reach the target accuracy.
 
 \section{Conclusion / Future work}
+Training a Deep Reinforcement Learning agent takes a lot of time tuning the LSTM size, image size, learning rate and batch size will influence the time reach it's target accuracy. The advantages of the C/C++ API develope by NVIDIA provide for robotics RL problems include leverage the power of GPU acceleration speed up RL agent training increase execution performance by using C/C++ compilation instead of interpreted python scripts optimized on specific embedded platform NVIDIA Jetson TX2
 \end{document}
