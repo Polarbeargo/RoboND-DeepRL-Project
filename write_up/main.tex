@@ -68,12 +68,13 @@ Deep Reinforcement Learning Arm Manipulation, DQN, Robotics Software Engineer Na
       \caption{From RL to Deep RL.}
       \label{fig:robot1}
 \end{figure}
-
-\subsection{Setup}
-\subsection{Building from Source (Nvidia Jetson TX2)}
+The difference between RL and Deep RL is the use of a deep neural network. Think of the collection of value-action pairs that define what actions an agent should take in any situation as a function of the observations that the agent receives from its environment. Neural network can be used to approximate this function because through its large quantity of parameters that can be learned through trial and error.
+\subsection{Setup and building from Source (Nvidia Jetson TX2)}
 
 \begin{lstlisting}
 $ sudo apt-get install cmake
+$ conda install -c pytorch pytorch
+$ sudo apt-get install libignition-math2-dev
 $ git clone http://github.com/udacity/RoboND-DeepRL-Project
 $ cd RoboND-DeepRL-Project
 $ git submodule update --init
@@ -133,10 +134,9 @@ avgGoalDelta  = (avgGoalDelta * ALPHA) + (distDelta * (1.0f - ALPHA));
 
 %example for Bullet point list
 \begin{itemize}
-\item Loss Reward:
-\item Win Reward:
-\item Interim Reward:
-\item Reward Value And Size :
+\item REWARD LOSS: When robotic arm can't completed it's a round task, this penalty will be issued.
+\item REWARD WIN: When robotic arm completed its round task, this reward will be issued.
+\item REWARD MUL: Base on the distance between the arm and the object use this distance to calculate an appropriate reward.
 \end {itemize}
 
 \subsection{DQN agent's hyperparameters}
@@ -155,7 +155,7 @@ avgGoalDelta  = (avgGoalDelta * ALPHA) + (distDelta * (1.0f - ALPHA));
 \end{lstlisting}
 \item Parameters Tuned:
 
-Input image size will influence memory usage. Small number will slow learning speed but minimize error. Smaller size will reduce more computing power.
+Input image size is quite large and influence memory usage. Reduce image size will improve performance. Optimizer were changed to RMSprop which is commonly used and produce good result.Small number learning rate will slow learning speed but minimize error. Smaller batch size will reduce more computing power.
 \begin{lstlisting}
 #define INPUT_WIDTH   64 
 #define INPUT_HEIGHT  64
@@ -196,24 +196,25 @@ Input image size will influence memory usage. Small number will slow learning sp
       \label{table:1}
       \end{center}
       \end{table}
-
-\begin{itemize}
-\item :
-\item : 
-\end {itemize}
 \section{Results}
-\begin{figure}[htpb]
-      \centering
-      \includegraphics[width=\linewidth]{80.png}
-      \caption{Achieved 90 percent}
-      \label{fig:achieved 80 percent}
-\end{figure}
+Both task have trained with the parameters in TABLE 1 and the two primary objectives were achieved:
+\begin{itemize}
+\item Have any part of the robot arm touch the object of interest, with at least a 90 percent accuracy. 
 \begin{figure}[htpb]
       \centering
       \includegraphics[width=\linewidth]{90.png}
       \caption{Achieved 90 percent.}
       \label{fig:achieved 90 percent}
 \end{figure}
-\section{Discussion}
+\item Have only the gripper base of the robot arm touch the object, with at least a 80 percent accuracy.
+\begin{figure}[htpb]
+      \centering
+      \includegraphics[width=\linewidth]{80.png}
+      \caption{Achieved 80 percent}
+      \label{fig:achieved 80 percent}
+\end{figure}
+\end {itemize}
+As Observed if don't add time penalty the robotic arm will start trembly around it's target and if the LSTM size lower than 256 will take longer time to reach the target accuracy.
+
 \section{Conclusion / Future work}
 \end{document}
