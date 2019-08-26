@@ -1,4 +1,8 @@
 
+[//]: # (Image References)
+[image1]: ./write_up/802.gif
+[image2]: ./write_up/20.gif
+
 # Deep RL Arm Manipulation
 
 This project is based on the Nvidia open source project "jetson-reinforcement" developed by [Dustin Franklin](https://github.com/dusty-nv). The goal of the project is to create a DQN agent and define reward functions to teach a robotic arm to carry out two primary objectives:
@@ -120,3 +124,10 @@ $ ./gazebo-arm.sh
 <img src="https://github.com/dusty-nv/jetson-reinforcement/raw/master/docs/images/gazebo_arm.jpg">
 
 The plugins which hook the learning into the simulation are located in the `gazebo/` directory of the repo. The RL agent and the reward functions are to be defined in [`ArmPlugin.cpp`](gazebo/ArmPlugin.cpp).
+
+## Results
+
+### Accuracy: 80% :
+![][image1]  
+### Accuracy: 90% :
+![][image2]  
